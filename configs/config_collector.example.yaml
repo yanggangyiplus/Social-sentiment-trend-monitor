@@ -1,0 +1,30 @@
+# 데이터 수집 설정 예제 파일
+# 이 파일을 config_collector.yaml로 복사하여 사용하세요
+
+# YouTube 설정
+youtube:
+  enabled: true
+  api_key: "YOUR_YOUTUBE_API_KEY_HERE"  # YouTube Data API v3 키 입력
+  max_results_per_keyword: 10  # 키워드당 최대 검색 결과 수
+  max_comments_per_video: 100  # 비디오당 최대 댓글 수
+  order: "relevance"  # 검색 정렬 기준: relevance, date, rating, viewCount
+
+# X (트위터) 설정 (v2에서 구현 예정)
+twitter:
+  enabled: false
+  api_key: ""
+  api_secret: ""
+  access_token: ""
+  access_token_secret: ""
+  bearer_token: ""
+
+# 뉴스 설정 (v1에서 구현 예정)
+news:
+  enabled: false
+  sources: []  # 뉴스 소스 리스트
+
+# 블로그 설정 (v1에서 구현 예정)
+blog:
+  enabled: false
+  sources: []  # 블로그 소스 리스트
+

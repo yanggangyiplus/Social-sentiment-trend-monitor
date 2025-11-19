@@ -1,0 +1,24 @@
+# 트렌드 분석 설정 예제 파일
+# 이 파일을 config_trend.yaml로 복사하여 사용하세요
+
+# 시계열 분석 설정
+time_series:
+  aggregation_window: "1h"  # 집계 시간 단위 (1h, 6h, 1d)
+  min_data_points: 10  # 최소 데이터 포인트 수
+
+# 변화 탐지 설정
+change_detection:
+  use_simple: true  # v0: 간단한 알고리즘 사용 (true) / v1: 전문 알고리즘 사용 (false)
+  window_minutes: 10  # 집계 시간 단위 (분) - use_simple=true일 때 사용
+  threshold: 0.3  # 변화 감지 임계값 (변화율)
+  
+  # 전문 알고리즘 설정 (use_simple=false일 때 사용)
+  method: "pelt"  # "pelt" or "window"
+  min_size: 2  # 최소 세그먼트 크기
+  penalty: 10  # 페널티 파라미터
+
+# 알림 설정
+alerts:
+  enabled: true
+  threshold_change_rate: 0.5  # 변화율 임계값 (50% 이상 변화 시 알림)
+
