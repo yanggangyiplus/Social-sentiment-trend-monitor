@@ -16,6 +16,8 @@ from src.utils.config import load_config
 from .time_series import TimeSeriesAnalyzer
 from .change_detection import ChangeDetector
 from .simple_change_detector import SimpleChangeDetector
+from .advanced_change_detectors import CUSUMDetector, ZScoreDetector, BayesianChangeDetector
+from .advanced_change_detectors import CUSUMDetector, ZScoreDetector, BayesianChangeDetector
 
 
 class TrendAnalyzer:
@@ -38,20 +40,37 @@ class TrendAnalyzer:
             aggregation_window=time_series_config.get("aggregation_window", "1h")
         )
         
-        # 변화 탐지기 초기화 (v0: SimpleChangeDetector 사용)
+        # 변화 탐지기 초기화 (고급 알고리즘 지원)
         change_config = self.config.get("change_detection", {})
-        use_simple = change_config.get("use_simple", True)  # v0에서는 간단한 방법 사용
+        method = change_config.get("method", "simple")  # simple, cusum, zscore, bayesian, advanced
         
-        if use_simple:
-            self.change_detector = SimpleChangeDetector(
-                window_minutes=change_config.get("window_minutes", 10),
+        if method == "cusum":
+            self.change_detector = CUSUMDetector(
+                threshold=change_config.get("cusum_threshold", 5.0),
+                drift=change_config.get("drift", 0.5)
+            )
+        elif method == "zscore":
+            self.change_detector = ZScoreDetector(
+                z_threshold=change_config.get("z_threshold", 2.5),
+                window_size=change_config.get("window_size", 10)
+            )
+        elif method == "bayesian":
+            self.change_detector = BayesianChangeDetector(
+                prior_probability=change_config.get("prior_probability", 0.01),
+                min_segment_length=change_config.get("min_segment_length", 5)
+            )
+        elif method == "advanced":
+            # 고급 ChangeDetector 사용
+            self.change_detector = ChangeDetector(
+                method=change_config.get("advanced_method", "pelt"),
+                min_size=change_config.get("min_size", 2),
+                penalty=change_config.get("penalty", 10),
                 threshold=change_config.get("threshold", 0.3)
             )
         else:
-            self.change_detector = ChangeDetector(
-                method=change_config.get("method", "pelt"),
-                min_size=change_config.get("min_size", 2),
-                penalty=change_config.get("penalty", 10),
+            # 기본: SimpleChangeDetector 사용
+            self.change_detector = SimpleChangeDetector(
+                window_minutes=change_config.get("window_minutes", 10),
                 threshold=change_config.get("threshold", 0.3)
             )
         
@@ -94,9 +113,10 @@ class TrendAnalyzer:
         scores = aggregated_df['sentiment_score'].tolist()
         trend_direction = self.time_series_analyzer.get_trend_direction(scores)
         
-        # 변화점 탐지 (SimpleChangeDetector 사용 시)
-        if isinstance(self.change_detector, SimpleChangeDetector):
-            # SimpleChangeDetector는 리스트를 받음
+        # 변화점 탐지 (모든 탐지기 지원)
+        if isinstance(self.change_detector, 
+                     (SimpleChangeDetector, CUSUMDetector, ZScoreDetector, BayesianChangeDetector)):
+            # 리스트 형태로 변환
             sentiment_list = aggregated_df.to_dict('records')
             change_points_data = self.change_detector.detect_changes(sentiment_list)
             # 변화점 datetime 변환 (안전하게 처리)

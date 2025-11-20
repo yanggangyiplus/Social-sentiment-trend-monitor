@@ -33,45 +33,33 @@ ENV/
 *.swo
 *~
 
-# Jupyter Notebook
-.ipynb_checkpoints
-*.ipynb
+# Environment variables
+.env
+.env.local
 
-# 데이터베이스
+# Database
 *.db
 *.sqlite
 *.sqlite3
 data/database/*.db
 
-# 로그
+# Logs
+logs/
 *.log
-experiments/logs/*.log
-
-# 설정 파일 (API 키 포함)
-configs/*.yaml
-!configs/*.example.yaml
-
-# 환경 변수
-.env
-.env.local
 
 # OS
 .DS_Store
 Thumbs.db
 
-# 임시 파일
-*.tmp
-*.bak
-*.swp
+# Jupyter Notebook
+.ipynb_checkpoints
 
-# 실험 결과
-experiments/results/*
-!experiments/results/.gitkeep
-experiments/reports/*
-!experiments/reports/.gitkeep
+# pytest
+.pytest_cache/
+.coverage
+htmlcov/
 
-# 원본 데이터
-data/raw/*
-!data/raw/.gitkeep
-data/processed/*
-!data/processed/.gitkeep
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json

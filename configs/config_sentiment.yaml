@@ -1,0 +1,41 @@
+# 감정 분석 설정
+
+# 모델 설정
+model:
+  type: "rule_based"  # "kcbert" (Fine-tuning 필요), "kobert", "rule_based" (즉시 사용 가능), or "llm"
+  model_name: "beomi/KcBERT-base"  # KcBERT-base 모델 (AI 허브 한국어 감정 데이터셋 기반)
+  
+  # Fine-tuning된 모델 경로 (선택사항)
+  # 로컬 경로 또는 HuggingFace 모델명 지정 가능
+  # 예: "./models/fine_tuned_sentiment" 또는 "alsgyu/sentiment-analysis-fine-tuned-model"
+  # 참고: Fine-tuning된 모델이 없으면 규칙 기반 분석기로 자동 fallback
+  fine_tuned_model_path: null  # null이면 기본 모델 사용 (fine-tuning 필요)
+  
+  # LLM 설정 (type이 "llm"일 때 사용)
+  llm:
+    provider: "openai"  # "openai" or "anthropic"
+    model_name: "gpt-3.5-turbo"
+    api_key: ""
+    temperature: 0.3
+
+# 감정 분류 설정
+sentiment:
+  classes: ["positive", "negative", "neutral"]
+  threshold: 0.5  # 중립 판단 임계값
+
+# 배치 처리 설정
+batch:
+  batch_size: 32
+  max_length: 512
+
+# 고급 분석 기능 설정
+advanced:
+  # 9가지 감정 분류 활성화 (anger, fear, joy, sadness, surprise, disgust, trust, anticipation, neutral)
+  enable_emotion_classification: true
+  
+  # 토픽-감정 동시 분석 활성화
+  enable_topic_sentiment: true
+  
+  # BERTopic 사용 여부 (False면 키워드 기반 토픽 분석 사용)
+  use_bertopic: true
+

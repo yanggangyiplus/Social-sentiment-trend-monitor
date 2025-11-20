@@ -14,6 +14,8 @@ from .kobert_analyzer import KoBERTAnalyzer
 from .kcbert_analyzer import KcBERTAnalyzer
 from .rule_based_analyzer import RuleBasedAnalyzer
 from .llm_analyzer import LLMAnalyzer
+from .emotion_classifier import EmotionClassifier
+from .topic_sentiment_analyzer import TopicSentimentAnalyzer
 
 
 class SentimentAnalyzer:
@@ -55,6 +57,22 @@ class SentimentAnalyzer:
             raise ValueError(f"지원하지 않는 모델 타입: {model_type}")
         
         self.model_type = model_type
+        
+        # 고급 분석 기능 초기화
+        advanced_config = self.config.get("advanced", {})
+        self.enable_emotion_classification = advanced_config.get("enable_emotion_classification", False)
+        self.enable_topic_sentiment = advanced_config.get("enable_topic_sentiment", False)
+        
+        if self.enable_emotion_classification:
+            self.emotion_classifier = EmotionClassifier()
+        else:
+            self.emotion_classifier = None
+        
+        if self.enable_topic_sentiment:
+            use_bertopic = advanced_config.get("use_bertopic", True)
+            self.topic_sentiment_analyzer = TopicSentimentAnalyzer(use_bertopic=use_bertopic)
+        else:
+            self.topic_sentiment_analyzer = None
     
     def analyze(self, text: str) -> Dict[str, Any]:
         """
@@ -68,6 +86,12 @@ class SentimentAnalyzer:
         """
         result = self.analyzer.analyze(text)
         result["model_type"] = self.model_type
+        
+        # 9가지 감정 분류 추가
+        if self.enable_emotion_classification and self.emotion_classifier:
+            emotion_result = self.emotion_classifier.classify_emotion(text)
+            result["emotion"] = emotion_result
+        
         return result
     
     def analyze_batch(self, texts: list) -> list:
@@ -83,5 +107,34 @@ class SentimentAnalyzer:
         results = self.analyzer.analyze_batch(texts)
         for result in results:
             result["model_type"] = self.model_type
+            
+            # 9가지 감정 분류 추가
+            if self.enable_emotion_classification and self.emotion_classifier:
+                text_idx = results.index(result)
+                if text_idx < len(texts):
+                    emotion_result = self.emotion_classifier.classify_emotion(texts[text_idx])
+                    result["emotion"] = emotion_result
+        
         return results
+    
+    def analyze_topics_and_sentiment(self, texts: list, sentiments: list = None) -> Dict[str, Any]:
+        """
+        토픽 모델링 및 토픽별 감정 분석
+        
+        Args:
+            texts: 텍스트 리스트
+            sentiments: 감정 분석 결과 리스트 (선택사항)
+        
+        Returns:
+            토픽 및 감정 분석 결과
+        """
+        if not self.enable_topic_sentiment or not self.topic_sentiment_analyzer:
+            return {
+                "topics": [],
+                "topic_sentiments": {},
+                "method": "none",
+                "message": "토픽 분석이 비활성화되어 있습니다."
+            }
+        
+        return self.topic_sentiment_analyzer.analyze_topics_and_sentiment(texts, sentiments)
 

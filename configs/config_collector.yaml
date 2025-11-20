@@ -1,0 +1,42 @@
+# 데이터 수집 설정
+
+# 수집 소스 설정
+sources:
+  youtube:
+    enabled: true  # v0: YouTube만 실제 구현
+    api_key: ""  # YouTube Data API v3 키 (config_collector.example.yaml 참고)
+    max_results: 10  # 검색할 비디오 개수 (최대 50)
+    max_comments_per_video: 20  # 비디오당 수집할 댓글 개수 (최대 100)
+    language: "ko"
+  
+  twitter:
+    enabled: false  # v0: Mock Data, v2: 실제 구현 예정
+    api_key: ""
+    api_secret: ""
+    access_token: ""
+    access_token_secret: ""
+    max_tweets: 100
+  
+  news:
+    enabled: false  # v0: Mock Data, v1: 실제 구현 예정
+    sources:
+      - "https://news.naver.com/rss"
+      - "https://rss.cnn.com/rss/edition.rss"
+    max_articles: 50
+  
+  blog:
+    enabled: false  # v0: Mock Data, v1: 실제 구현 예정
+    sources:
+      - "https://blog.naver.com"
+    max_posts: 50
+
+# 수집 스케줄 설정
+schedule:
+  interval_minutes: 60  # 1시간마다 수집
+  keywords: []  # 모니터링할 키워드 리스트
+
+# 저장 설정
+storage:
+  database_path: "data/database/sentiment.db"
+  raw_data_path: "data/raw"
+

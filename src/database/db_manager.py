@@ -6,6 +6,7 @@ from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import StaticPool
 from pathlib import Path
 from typing import Optional
+from contextlib import contextmanager
 import os
 
 from .models import Base, CollectedText, SentimentAnalysis, TrendAlert
@@ -76,11 +77,34 @@ def init_database(database_url: str):
     _db_manager = DatabaseManager(database_url)
 
 
-def get_db() -> Session:
+def get_db():
     """
-    데이터베이스 세션 반환 (의존성 주입용)
+    데이터베이스 세션 반환 (의존성 주입용 - FastAPI Depends에서 사용)
     
-    Returns:
+    Yields:
+        Session: 데이터베이스 세션
+    """
+    if _db_manager is None:
+        raise RuntimeError("데이터베이스가 초기화되지 않았습니다. init_database()를 먼저 호출하세요.")
+    
+    db = _db_manager.get_session()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+@contextmanager
+def get_db_session():
+    """
+    데이터베이스 세션을 contextmanager로 제공 (with 문 사용)
+    
+    사용 예:
+        with get_db_session() as db:
+            # DB 작업 수행
+            pass
+    
+    Yields:
         Session: 데이터베이스 세션
     """
     if _db_manager is None:

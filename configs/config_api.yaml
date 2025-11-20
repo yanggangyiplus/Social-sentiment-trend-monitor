@@ -1,0 +1,20 @@
+# API 설정
+
+# 서버 설정
+server:
+  host: "0.0.0.0"
+  port: 8000
+  reload: true
+
+# CORS 설정
+cors:
+  allow_origins: ["*"]  # 프로덕션에서는 특정 도메인만 허용
+  allow_credentials: true
+  allow_methods: ["*"]
+  allow_headers: ["*"]
+
+# 데이터베이스 설정
+database:
+  url: "sqlite:///data/database/sentiment.db"
+  echo: false
+

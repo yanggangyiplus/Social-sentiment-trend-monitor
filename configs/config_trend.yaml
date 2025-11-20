@@ -1,0 +1,38 @@
+# 트렌드 분석 설정 파일
+
+# 시계열 분석 설정
+time_series:
+  aggregation_window: "1h"  # 집계 시간 단위 (1h, 30m, 10m 등)
+  min_data_points: 5  # 최소 데이터 포인트 수
+
+# 변화점 탐지 설정
+change_detection:
+  # 방법 선택: simple, cusum, zscore, bayesian, advanced
+  method: "simple"  # 기본값: simple (SimpleChangeDetector)
+  
+  # SimpleChangeDetector 설정
+  window_minutes: 10
+  threshold: 0.3
+  
+  # CUSUM 설정
+  cusum_threshold: 5.0
+  drift: 0.5
+  
+  # Z-score 설정
+  z_threshold: 2.5
+  window_size: 10
+  
+  # Bayesian 설정
+  prior_probability: 0.01
+  min_segment_length: 5
+  
+  # Advanced ChangeDetector 설정
+  advanced_method: "pelt"  # pelt, window
+  min_size: 2
+  penalty: 10
+
+# 알림 설정
+alerts:
+  enabled: true
+  threshold_change_rate: 0.5  # 변화율 임계값
+  notification_channels: []  # 향후 확장용

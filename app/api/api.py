@@ -179,7 +179,7 @@ async def get_trend_changes(
     db: Session = Depends(get_db)
 ):
     """
-    트렌드 변화점 조회 (명확한 엔드포인트)
+    트렌드 변화점 조회 (서비스 레이어 사용)
     
     Args:
         keyword: 키워드
@@ -189,7 +189,7 @@ async def get_trend_changes(
     Returns:
         트렌드 변화점 정보
     """
-    from src.trend.trend_utils import TrendAnalyzer
+    from app.services import trend_service
     
     # 기간 내 감정 분석 데이터 조회
     start_time = datetime.utcnow() - timedelta(hours=hours)
@@ -201,9 +201,6 @@ async def get_trend_changes(
     if not sentiment_data:
         raise HTTPException(status_code=404, detail=f"키워드 '{keyword}'에 대한 데이터를 찾을 수 없습니다.")
     
-    # 트렌드 분석 수행
-    trend_analyzer = TrendAnalyzer()
-    
     # 데이터 변환
     sentiment_list = []
     for item in sentiment_data:
@@ -214,13 +211,13 @@ async def get_trend_changes(
             "neutral_score": item.neutral_score
         })
     
-    trend_result = trend_analyzer.analyze_trend(sentiment_list)
+    # 트렌드 분석 수행 (서비스 레이어 사용)
+    trend_result = trend_service.analyze_trend_with_change_points(sentiment_list)
     
     return {
         "keyword": keyword,
-        "trend_direction": trend_result["trend_direction"],
-        "change_points": trend_result["change_points"],
-        "alerts": trend_result["alerts"],
+        "change_points": trend_result.get("change_points", []),
+        "alerts": trend_result.get("alerts", []),
         "total_data_points": len(sentiment_data)
     }
 
@@ -307,26 +304,71 @@ async def get_alerts(
 @app.post("/collect")
 async def start_collection(
     keyword: str,
+    sources: List[str] = Query(["youtube"], description="수집할 소스 리스트"),
     max_results: int = Query(50, ge=1, le=500, description="소스당 최대 수집 개수")
 ):
     """
-    데이터 수집 시작 (비동기 작업으로 실행)
+    데이터 수집 시작
     
     Args:
         keyword: 수집할 키워드
+        sources: 수집할 소스 리스트
         max_results: 소스당 최대 수집 개수
         
     Returns:
-        수집 작업 시작 응답
+        수집 작업 결과
     """
-    # 실제 구현에서는 백그라운드 작업으로 실행
-    # 여기서는 간단히 응답만 반환
-    return {
-        "message": f"키워드 '{keyword}'에 대한 데이터 수집이 시작되었습니다.",
-        "keyword": keyword,
-        "max_results": max_results,
-        "status": "started"
-    }
+    from app.services import monitoring_service
+    
+    try:
+        success, count = monitoring_service.run_data_collection(keyword, sources, max_results)
+        if success:
+            return {
+                "message": f"데이터 수집 완료",
+                "keyword": keyword,
+                "sources": sources,
+                "collected_count": count,
+                "status": "success"
+            }
+        else:
+            raise HTTPException(status_code=500, detail=f"데이터 수집 실패: {count}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"수집 중 오류 발생: {str(e)}")
+
+
+@app.post("/analyze")
+async def start_analysis(
+    keyword: str,
+    source: str = Query("youtube", description="분석할 소스"),
+    hours: int = Query(24, ge=1, le=168, description="분석 기간 (시간)")
+):
+    """
+    감정 분석 시작
+    
+    Args:
+        keyword: 분석할 키워드
+        source: 분석할 소스
+        hours: 분석 기간 (시간)
+        
+    Returns:
+        분석 작업 결과
+    """
+    from app.utils import sentiment_analysis
+    
+    try:
+        success, count = sentiment_analysis.run_sentiment_analysis(keyword, source, hours)
+        if success:
+            return {
+                "message": f"감정 분석 완료",
+                "keyword": keyword,
+                "source": source,
+                "analyzed_count": count,
+                "status": "success"
+            }
+        else:
+            raise HTTPException(status_code=500, detail=f"감정 분석 실패: {count}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"분석 중 오류 발생: {str(e)}")
 
 
 @app.get("/keywords")
