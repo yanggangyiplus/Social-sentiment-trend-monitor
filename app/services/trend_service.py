@@ -8,7 +8,7 @@ from typing import List, Dict, Any, Optional
 from src.trend.trend_utils import TrendAnalyzer
 from src.trend.simple_change_detector import SimpleChangeDetector
 from src.trend.advanced_change_detectors import CUSUMDetector, ZScoreDetector, BayesianChangeDetector
-from app.web.utils.logger_config import trend_logger as logger
+from app.utils.logger_config import trend_logger as logger
 
 
 def analyze_trend_with_change_points(

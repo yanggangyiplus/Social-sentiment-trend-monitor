@@ -9,8 +9,8 @@ from src.database.db_manager import get_db_session
 from src.database.models import SentimentAnalysis
 from src.sentiment.sentiment_utils import SentimentAnalyzer
 from src.preprocessing.text_cleaner import TextCleaner
-from app.web.utils.db_queries import get_unanalyzed_texts
-from app.web.utils.logger_config import sentiment_logger as logger
+from app.utils.db_queries import get_unanalyzed_texts
+from app.utils.logger_config import sentiment_logger as logger
 
 
 def run_sentiment_analysis(keyword: str, source: str, hours: int = 24) -> Tuple[bool, int]:

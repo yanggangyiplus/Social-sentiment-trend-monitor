@@ -6,8 +6,8 @@ from typing import Tuple, List
 from datetime import datetime
 
 from src.collectors.collector_manager import CollectorManager
-from app.web.utils import sentiment_analysis, constants
-from app.web.utils.logger_config import collector_logger as logger
+from app.utils import sentiment_analysis, constants
+from app.utils.logger_config import collector_logger as logger
 
 
 def run_data_collection(keyword: str, sources: List[str], max_results: int = 10) -> Tuple[bool, int]:

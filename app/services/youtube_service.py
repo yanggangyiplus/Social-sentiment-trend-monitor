@@ -7,7 +7,7 @@ from collections import defaultdict
 
 from src.database.db_manager import get_db_session
 from src.database.models import CollectedText, SentimentAnalysis
-from app.web.utils.logger_config import youtube_logger as logger
+from app.utils.logger_config import youtube_logger as logger
 
 
 def get_all_video_data(keyword: str) -> Tuple[List[Dict], Dict[str, List], Dict[int, Dict]]:

@@ -11,7 +11,8 @@ import logging
 from collections import defaultdict
 
 # 프로젝트 루트를 경로에 추가
-PROJECT_ROOT = Path(__file__).parent.parent
+# app/web/web_demo.py -> app/web -> app -> 프로젝트 루트
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.database.db_manager import init_database, get_db_session

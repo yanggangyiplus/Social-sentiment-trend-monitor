@@ -8,7 +8,7 @@ from datetime import datetime
 from typing import List, Dict, Any
 from collections import defaultdict
 
-from app.web.utils.db_queries import (
+from app.utils.db_queries import (
     get_comments_by_keyword,
     get_sentiments_by_keyword,
     get_sentiments_by_text_ids
@@ -68,7 +68,7 @@ def generate_sentiment_csv(keyword: str) -> bytes:
     text_ids = [sent.text_id for sent in sentiments_data]
     
     # 원본 텍스트 조회
-    from app.web.utils.db_queries import get_comments_by_keyword
+    from app.utils.db_queries import get_comments_by_keyword
     comments = get_comments_by_keyword(keyword)
     comments_dict = {c.id: c for c in comments}
     

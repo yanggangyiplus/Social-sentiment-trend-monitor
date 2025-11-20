@@ -8,7 +8,7 @@ from collections import defaultdict
 from src.sentiment.sentiment_utils import SentimentAnalyzer
 from src.sentiment.emotion_classifier import EmotionClassifier
 from src.sentiment.topic_sentiment_analyzer import TopicSentimentAnalyzer
-from app.web.utils.logger_config import app_logger as logger
+from app.utils.logger_config import app_logger as logger
 
 
 class EmotionService:
